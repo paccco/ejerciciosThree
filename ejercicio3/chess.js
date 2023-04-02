@@ -7,14 +7,14 @@ class chess extends THREE.Object3D {
     
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    //this.createGUI(gui,titleGui);
+    this.createGUI(gui,titleGui);
 
     this.RotacionZ=0;
 
     this.material = new THREE.MeshPhongMaterial({color: 0xCF0000});
 
     this.elMesh=this.createShape();
-    this.geometria=this.createGeometria();
+    this.geometria=this.createGeometria(24,2*Math.PI);
 
     this.add(this.geometria);
   }
@@ -39,9 +39,9 @@ class chess extends THREE.Object3D {
     return out;
   }
 
-  createGeometria(){
+  createGeometria(resolucion,anguloF){
     var puntos=this.chessShape.extractPoints(6).shape;
-    var lathGeom=new LatheGeometry(puntos,24,0,Math.PI);
+    var lathGeom=new LatheGeometry(puntos,resolucion,0,anguloF);
 
     var out=new THREE.Mesh(lathGeom,this.material);
     
@@ -50,34 +50,31 @@ class chess extends THREE.Object3D {
   
   createGUI (gui,titleGui) {
     this.guiControls = {
-      radTop : 1,
-      radBot : 1,
-      alt : 3,
-      radSeg : 6,
-      heightSeg : 1
+      resol:24,
+      angFinal: 2*Math.PI
     }
 
     var folder = gui.addFolder (titleGui);
 
-    folder.add (this.guiControls, 'radTop', 1, 5, 0.2)
-      .name ('Radio superior : ')
-      .onChange ( (value) => this.setRadTop(value) );
-    
-    folder.add (this.guiControls, 'radBot', 1, 5, 0.2)
-      .name ('Radio inferior : ')
-      .onChange ( (value) => this.setRadBot(value) );
-    
-    folder.add (this.guiControls, 'alt', 1, 5, 0.2)
-      .name ('Altura : ')
-      .onChange ( (value) => this.setHeightSeg(value) );
+    folder.add (this.guiControls, 'resol', 3, 48, 1)
+      .name ('Resolucion : ')
+      .onChange ( (value) => this.setResolucion(value) );
 
-    folder.add (this.guiControls, 'radSeg', 3, 32, 1)
-      .name ('Segmentos raidales : ')
-      .onChange ( (value) => this.setRadSeg(value) );
-    
-    folder.add (this.guiControls, 'heightSeg', 1, 40, 1)
-      .name ('Segmentos altura : ')
-      .onChange ( (value) => this.setHeightSeg(value) );
+    folder.add(this.guiControls, 'angFinal', 0, 2*Math.PI, Math.PI/180)
+      .name ('Angulo Final : ')
+      .onChange ( (value) => this.setAng(value) );
+  }
+
+  setResolucion(res){
+    this.geometria=this.createGeometria(res,this.guiControls.angFinal);
+    this.clear();
+    this.add(this.geometria);
+  }
+
+  setAng(ang){
+    this.geometria=this.createGeometria(this.guiControls.resol,ang);
+    this.clear();
+    this.add(this.geometria);
   }
 
   update () {
