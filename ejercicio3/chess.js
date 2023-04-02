@@ -1,3 +1,4 @@
+import { LatheGeometry } from 'three';
 import * as THREE from '../libs/three.module.js'
 
 class chess extends THREE.Object3D {
@@ -12,30 +13,38 @@ class chess extends THREE.Object3D {
 
     this.material = new THREE.MeshPhongMaterial({color: 0xCF0000});
 
-    this.chess=this.createShape();
+    this.elMesh=this.createShape();
+    this.geometria=this.createGeometria();
 
-    this.add(this.chess);
+    this.add(this.geometria);
   }
 
   createShape(){
-    var chess_ = new THREE.Shape();
-    
+    this.chessShape = new THREE.Shape();
 
+    this.chessShape.moveTo(0,0);
 
-    chess_.moveTo(0,0);
+    this.chessShape.lineTo(-2,0);
 
-    chess_.lineTo(-2,0);
+    this.chessShape.lineTo(-2,0.5);
 
-    chess_.lineTo(-2,0.5);
+    this.chessShape.quadraticCurveTo(-0.5,2,-0.5,3.5);
 
-    chess_.quadraticCurveTo(-0.5,2,-0.5,3.5);
+    this.chessShape.bezierCurveTo(-0.8,3.6,-0.7,4.1,0,4.1);
 
-    chess_.bezierCurveTo(-0.8,3.6,-0.7,4.1,0,4.1);
-
-    var chessGeometry=new THREE.ShapeGeometry(chess_);
+    var chessGeometry=new THREE.ShapeGeometry(this.chessShape);
 
     var out=new THREE.Mesh(chessGeometry,this.material);
 
+    return out;
+  }
+
+  createGeometria(){
+    var puntos=this.chessShape.extractPoints(6).shape;
+    var lathGeom=new LatheGeometry(puntos,24,0,Math.PI);
+
+    var out=new THREE.Mesh(lathGeom,this.material);
+    
     return out;
   }
   
